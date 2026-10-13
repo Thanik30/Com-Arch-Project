@@ -1,0 +1,7 @@
+@"
+build/
+.vscode/
+*.exe
+*.out
+*.o
+"@ | Out-File -FilePath .gitignore -Encoding utf8venv/
