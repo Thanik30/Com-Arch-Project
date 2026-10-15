@@ -10,7 +10,7 @@ class State:
         self.reg = [0] * NUMREGS
         self.numMemory = 0
 
-# ฟังก์ชันห้ามแก้เด็ดขาด! (กูแปลงเป็น Python ให้ตรงตามแพทเทิร์น C ของอาจารย์เป๊ะๆ)
+
 def printState(state):
     print("\n@@@\nstate:")
     print(f"\tpc {state.pc}")
@@ -112,12 +112,10 @@ def main():
                 state.pc += 1
 
         elif opcode == 5:  # jalr
-            # เก็บ PC+1 ไว้ใน rt แล้วกระโดดไปที่ที่อยู่ใน rs
-            # ระวัง: ถ้า rs == rt ต้องเก็บค่าก่อนกระโดด
-            next_pc = state.pc + 1
-            target = state.reg[rs]
-            state.reg[rt] = next_pc
-            state.pc = target
+            # 1. เก็บ PC+1 ไว้ใน rt ก่อน
+            state.reg[rt] = state.pc + 1
+            # 2. ค่อยกระโดดไปที่ address ที่อยู่ใน rs (ถ้า rs == rt ก็จะได้ค่า PC+1 ที่เพิ่งบันทึกไป)
+            state.pc = state.reg[rs]
 
         elif opcode == 6:  # halt
             state.pc += 1
