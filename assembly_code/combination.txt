@@ -1,0 +1,53 @@
+        lw      0 1 n           โหลด n=7 ใส่ reg 1
+        lw      0 2 r           โหลด r=3 ใส่ reg 2
+        lw      0 6 pos1        โหลด 1 ใส่ reg 6
+        lw      0 4 addrC       โหลด Address ของฟังก์ชัน comb ใส่ reg 4
+        lw      0 5 Stack       โหลด Address ฐานของ Stack ใส่ reg 5 (Stack Pointer)
+        jalr    4 7             เรียกฟังก์ชัน comb (เก็บ return address ไว้ใน reg 7)
+        halt                    จบการทำงาน (เมื่อรันเสร็จ ผลลัพธ์สุดท้ายจะอยู่ที่ reg 3)
+
+comb    sw      5 7 0           [Prologue] Push Return Address ($7) ลง Stack
+        add     5 6 5           เลื่อน Stack Pointer ขึ้น 1 ช่อง ($5 = $5 + 1)
+        sw      5 1 0           Push ค่า n ($1) ลง Stack
+        add     5 6 5           เลื่อน Stack Pointer ขึ้น 1 ช่อง
+        sw      5 2 0           Push ค่า r ($2) ลง Stack
+        add     5 6 5           เลื่อน Stack Pointer ขึ้น 1 ช่อง
+
+        beq     2 0 base        [Base Case] เช็คว่า r == 0 ไหม? ถ้าใช่โดดไป base
+        beq     1 2 base        [Base Case] เช็คว่า n == r ไหม? ถ้าใช่โดดไป base
+
+        nand    0 0 3           สร้างเลข -1 เก็บไว้ใน reg 3 (ประหยัดบรรทัดสุดๆ)
+        add     1 3 1           n = n - 1 (เพื่อเตรียมเรียก comb(n-1, r))
+        lw      0 4 addrC       
+        jalr    4 7             [Recursive 1] เรียก comb(n-1, r)
+        sw      5 3 0           Push ผลลัพธ์ที่ 1 (Result1) ที่ได้จาก reg 3 ลง Stack ก่อน
+        add     5 6 5           เลื่อน Stack Pointer ขึ้น 1 ช่อง
+
+        nand    0 0 3           สร้างเลข -1 เก็บไว้ใน reg 3 อีกรอบ
+        add     2 3 2           r = r - 1 (n เป็น n-1 อยู่แล้ว เลยกลายเป็น comb(n-1, r-1))
+        lw      0 4 addrC       
+        jalr    4 7             [Recursive 2] เรียก comb(n-1, r-1)
+
+        nand    0 0 4           สร้างเลข -1 เก็บไว้ใน reg 4 เพื่อเอาไว้ลด Stack
+        add     5 4 5           เลื่อน Stack Pointer ลง 1 ช่อง (เพื่อไปดึง Result1)
+        lw      5 4 0           Pop เอา Result1 ออกมาเก็บไว้ที่ reg 4
+        add     3 4 3           Result รวม = Result1 ($4) + Result2 ($3)
+        beq     0 0 done        คำนวณเสร็จ กระโดดไปช่วง Pop Stack
+
+base    lw      0 3 pos1        [Base Case] ถ้าเข้าเงื่อนไข ให้ Result ($3) = 1
+
+done    nand    0 0 4           สร้างเลข -1 เก็บไว้ใน reg 4
+        add     5 4 5           [Epilogue] เลื่อน SP ลง 1 ช่อง
+        lw      5 2 0           Pop ค่า r ($2) ดั้งเดิมกลับคืนมา
+        add     5 4 5           เลื่อน SP ลง 1 ช่อง
+        lw      5 1 0           Pop ค่า n ($1) ดั้งเดิมกลับคืนมา
+        add     5 4 5           เลื่อน SP ลง 1 ช่อง
+        lw      5 7 0           Pop ค่า Return Address ($7) ดั้งเดิมกลับคืนมา
+        jalr    7 0             Return กลับไปหาจุดที่เรียกมันมา
+
+n       .fill   7               โจทย์ให้ลอง n=7
+r       .fill   3               โจทย์ให้ลอง r=3
+pos1    .fill   1
+addrC   .fill   comb
+Stack   .fill   stack
+stack   .fill   0               จุดเริ่มต้นของ Stack (หน่วยความจำว่างๆ ด้านล่าง)[cite: 227]
