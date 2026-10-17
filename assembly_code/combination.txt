@@ -6,7 +6,7 @@
         jalr    4 7             เรียกฟังก์ชัน comb (เก็บ return address ไว้ใน reg 7)
         halt                    จบการทำงาน (เมื่อรันเสร็จ ผลลัพธ์สุดท้ายจะอยู่ที่ reg 3)
 
-comb    sw      5 7 0           [Prologue] Push Return Address ($7) ลง Stack
+comb    sw1      5 7 0           [Prologue] Push Return Address ($7) ลง Stack
         add     5 6 5           เลื่อน Stack Pointer ขึ้น 1 ช่อง ($5 = $5 + 1)
         sw      5 1 0           Push ค่า n ($1) ลง Stack
         add     5 6 5           เลื่อน Stack Pointer ขึ้น 1 ช่อง
@@ -50,4 +50,4 @@ r       .fill   3               โจทย์ให้ลอง r=3
 pos1    .fill   1
 addrC   .fill   comb
 Stack   .fill   stack
-stack   .fill   0               จุดเริ่มต้นของ Stack (หน่วยความจำว่างๆ ด้านล่าง)[cite: 227]
+stack   .fill   0               จุดเริ่มต้นของ Stack (หน่วยความจำว่างๆ ด้านล่าง)
